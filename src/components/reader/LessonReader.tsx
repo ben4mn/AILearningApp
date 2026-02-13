@@ -71,23 +71,36 @@ export function LessonReader() {
   }, [progress, isAlreadyCompleted, topicSlug, lessonSlug, handleAutoComplete, readyToComplete]);
 
   // Scroll restore or scroll to top
+  // Uses ResizeObserver to wait for ReactMarkdown content to render before restoring
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !topicSlug || !lessonSlug) return;
 
     const id = getLessonId(topicSlug, lessonSlug);
     const saved = useProgressStore.getState().lessons[id];
+    const targetPercent = (saved?.status === 'in-progress' && saved.scrollPercent > 0 && saved.scrollPercent < 100)
+      ? saved.scrollPercent
+      : 0;
 
-    if (saved?.status === 'in-progress' && saved.scrollPercent > 0 && saved.scrollPercent < 100) {
-      requestAnimationFrame(() => {
-        const scrollHeight = el.scrollHeight - el.clientHeight;
-        if (scrollHeight > 0) {
-          el.scrollTo(0, (saved.scrollPercent / 100) * scrollHeight);
-        }
-      });
-    } else {
+    if (targetPercent === 0) {
       el.scrollTo(0, 0);
+      return;
     }
+
+    // Content isn't rendered yet on first frame — watch for the container to grow
+    let restored = false;
+    const observer = new ResizeObserver(() => {
+      if (restored) return;
+      const scrollable = el.scrollHeight - el.clientHeight;
+      if (scrollable > 0) {
+        restored = true;
+        el.scrollTo(0, (targetPercent / 100) * scrollable);
+        observer.disconnect();
+      }
+    });
+    observer.observe(el);
+
+    return () => observer.disconnect();
   }, [topicSlug, lessonSlug]);
 
   if (!result || !topicSlug || !lessonSlug) {
