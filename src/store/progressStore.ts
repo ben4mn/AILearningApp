@@ -6,6 +6,7 @@ interface ProgressState {
   lessons: Record<string, LessonProgress>;
   markInProgress: (lessonId: string, topicId: string) => void;
   markCompleted: (lessonId: string, topicId: string) => void;
+  markUnread: (lessonId: string) => void;
   updateScroll: (lessonId: string, topicId: string, scrollPercent: number) => void;
 }
 
@@ -45,6 +46,12 @@ export const useProgressStore = create<ProgressState>()(
             },
           },
         })),
+
+      markUnread: (lessonId) =>
+        set((state) => {
+          const { [lessonId]: _, ...rest } = state.lessons;
+          return { lessons: rest };
+        }),
 
       updateScroll: (lessonId, topicId, scrollPercent) =>
         set((state) => {

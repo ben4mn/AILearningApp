@@ -28,7 +28,7 @@ export function ReaderHeader({ title, lessonNumber, totalLessons, color }: Reade
           className="text-xs font-medium px-2 py-1 rounded-full"
           style={{ backgroundColor: `${color}20`, color }}
         >
-          {lessonNumber} of {totalLessons}
+          Section {lessonNumber} of {totalLessons}
         </span>
       </div>
     </header>

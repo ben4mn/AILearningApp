@@ -22,7 +22,7 @@ export function StatsBar() {
 
       {/* Lesson count */}
       <span className="text-sm text-slate-400">
-        {completedCount}/{totalLessons} lessons
+        {completedCount}/{totalLessons} sections
       </span>
 
       {/* Completion ring */}

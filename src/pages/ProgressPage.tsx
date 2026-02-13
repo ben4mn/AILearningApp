@@ -25,7 +25,7 @@ export function ProgressPage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-slate-200">{completedCount}</div>
-              <div className="text-xs text-slate-500 mt-0.5">of {totalLessons} lessons</div>
+              <div className="text-xs text-slate-500 mt-0.5">of {totalLessons} sections</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-slate-200">

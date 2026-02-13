@@ -12,9 +12,12 @@ import { ReaderHeader } from './ReaderHeader';
 import { LessonNav } from './LessonNav';
 import { markdownComponents } from './MarkdownComponents';
 
+const MIN_TIME_MS = 3000;
+
 export function LessonReader() {
   const { topicSlug, lessonSlug } = useParams<{ topicSlug: string; lessonSlug: string }>();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const mountTime = useRef(Date.now());
   const progress = useScrollProgress(scrollRef);
 
   const result = topicSlug && lessonSlug ? getLesson(topicSlug, lessonSlug) : undefined;
@@ -37,7 +40,12 @@ export function LessonReader() {
     recordCompletion();
   }, [topicSlug, lessonSlug, isAlreadyCompleted, markCompleted, recordCompletion]);
 
-  const sentinelRef = useAutoComplete(scrollRef, handleAutoComplete, !isAlreadyCompleted);
+  const { sentinelRef, readyToComplete } = useAutoComplete(scrollRef, handleAutoComplete, !isAlreadyCompleted);
+
+  // Reset mount time when lesson changes
+  useEffect(() => {
+    mountTime.current = Date.now();
+  }, [topicSlug, lessonSlug]);
 
   // Mark as in-progress on mount
   useEffect(() => {
@@ -54,15 +62,38 @@ export function LessonReader() {
     updateScroll(id, topicSlug, progress);
   }, [progress, topicSlug, lessonSlug, isAlreadyCompleted, updateScroll]);
 
-  // Scroll to top when lesson changes
+  // Backup completion trigger: if observer fired too early and time has now passed
   useEffect(() => {
-    scrollRef.current?.scrollTo(0, 0);
+    if (isAlreadyCompleted || !topicSlug || !lessonSlug) return;
+    if (progress >= 95 && readyToComplete.current && Date.now() - mountTime.current >= MIN_TIME_MS) {
+      handleAutoComplete();
+    }
+  }, [progress, isAlreadyCompleted, topicSlug, lessonSlug, handleAutoComplete, readyToComplete]);
+
+  // Scroll restore or scroll to top
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !topicSlug || !lessonSlug) return;
+
+    const id = getLessonId(topicSlug, lessonSlug);
+    const saved = useProgressStore.getState().lessons[id];
+
+    if (saved?.status === 'in-progress' && saved.scrollPercent > 0 && saved.scrollPercent < 100) {
+      requestAnimationFrame(() => {
+        const scrollHeight = el.scrollHeight - el.clientHeight;
+        if (scrollHeight > 0) {
+          el.scrollTo(0, (saved.scrollPercent / 100) * scrollHeight);
+        }
+      });
+    } else {
+      el.scrollTo(0, 0);
+    }
   }, [topicSlug, lessonSlug]);
 
   if (!result || !topicSlug || !lessonSlug) {
     return (
       <div className="flex items-center justify-center h-screen text-slate-400">
-        Lesson not found
+        Section not found
       </div>
     );
   }

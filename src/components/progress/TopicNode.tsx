@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useCompletedSet } from '../../hooks/useProgress';
-import { getTopicCompletionCount, isTopicComplete, getLessonId } from '../../lib/curriculum';
+import { getTopicCompletionCount, isTopicComplete } from '../../lib/curriculum';
 import { ERA_COLORS } from '../../lib/constants';
 import type { Topic } from '../../types';
 
@@ -19,11 +19,7 @@ export function TopicNode({ topic, isLast }: TopicNodeProps) {
   const color = ERA_COLORS[topic.eraId];
 
   const handleClick = () => {
-    const firstUnread = topic.lessons.find(
-      (l) => !completedSet.has(getLessonId(topic.slug, l.slug))
-    );
-    const target = firstUnread || topic.lessons[0];
-    navigate(`/read/${topic.slug}/${target.slug}`);
+    navigate(`/chapter/${topic.slug}`);
   };
 
   return (
@@ -59,7 +55,7 @@ export function TopicNode({ topic, isLast }: TopicNodeProps) {
           {topic.title}
         </h3>
         <span className="text-xs text-slate-500 mt-0.5">
-          {completed}/{total} lessons · {topic.estimatedMinutes} min
+          {completed}/{total} sections · {topic.estimatedMinutes} min
         </span>
       </button>
     </div>

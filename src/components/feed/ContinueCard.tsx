@@ -16,7 +16,7 @@ export function ContinueCard() {
       <div className="mx-5 mb-6 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/20 p-6 text-center">
         <span className="text-3xl mb-2 block">🎉</span>
         <h2 className="text-lg font-bold text-slate-100">All Complete!</h2>
-        <p className="text-sm text-slate-400 mt-1">You've read all 108 lessons. Incredible.</p>
+        <p className="text-sm text-slate-400 mt-1">You've read all 108 sections. Incredible.</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export function ContinueCard() {
 
       <div className="flex items-center justify-between">
         <span className="text-xs text-slate-500">
-          {topic.title} · {completedInTopic}/{topic.lessons.length} lessons
+          {topic.title} · {completedInTopic}/{topic.lessons.length} sections
         </span>
         <span className="text-xs text-slate-500">{result.lesson.readingTimeMinutes} min</span>
       </div>
