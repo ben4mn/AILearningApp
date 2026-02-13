@@ -18,6 +18,7 @@ export function LessonReader() {
   const { topicSlug, lessonSlug } = useParams<{ topicSlug: string; lessonSlug: string }>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const mountTime = useRef(Date.now());
+  const restoringScroll = useRef(true);
   const progress = useScrollProgress(scrollRef);
 
   const result = topicSlug && lessonSlug ? getLesson(topicSlug, lessonSlug) : undefined;
@@ -42,9 +43,10 @@ export function LessonReader() {
 
   const { sentinelRef, readyToComplete } = useAutoComplete(scrollRef, handleAutoComplete, !isAlreadyCompleted);
 
-  // Reset mount time when lesson changes
+  // Reset refs when lesson changes
   useEffect(() => {
     mountTime.current = Date.now();
+    restoringScroll.current = true;
   }, [topicSlug, lessonSlug]);
 
   // Mark as in-progress on mount
@@ -55,8 +57,9 @@ export function LessonReader() {
     recordReading();
   }, [topicSlug, lessonSlug, markInProgress, recordReading]);
 
-  // Update scroll progress
+  // Update scroll progress — skip while restoring to avoid overwriting saved position
   useEffect(() => {
+    if (restoringScroll.current) return;
     if (!topicSlug || !lessonSlug || isAlreadyCompleted) return;
     const id = getLessonId(topicSlug, lessonSlug);
     updateScroll(id, topicSlug, progress);
@@ -84,6 +87,7 @@ export function LessonReader() {
 
     if (targetPercent === 0) {
       el.scrollTo(0, 0);
+      restoringScroll.current = false;
       return;
     }
 
@@ -96,6 +100,10 @@ export function LessonReader() {
         restored = true;
         el.scrollTo(0, (targetPercent / 100) * scrollable);
         observer.disconnect();
+        // Resume scroll tracking after restore settles
+        requestAnimationFrame(() => {
+          restoringScroll.current = false;
+        });
       }
     });
     observer.observe(el);
