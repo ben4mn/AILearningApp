@@ -7,10 +7,10 @@ export function FeedPage() {
   const sortedEras = [...eras].sort((a, b) => a.order - b.order);
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-20">
+    <div className="min-h-screen bg-slate-900" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="max-w-lg mx-auto">
-        <div className="px-5 pt-safe-top">
-          <h1 className="text-lg font-bold text-slate-100 pt-4 pb-1">History of AI</h1>
+        <div className="px-5" style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
+          <h1 className="text-lg font-bold text-slate-100 pb-1">History of AI</h1>
         </div>
 
         <StatsBar />

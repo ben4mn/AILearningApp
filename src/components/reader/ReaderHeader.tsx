@@ -11,7 +11,7 @@ export function ReaderHeader({ title, lessonNumber, totalLessons, color }: Reade
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800/50">
+    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800/50" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <div className="flex items-center gap-3 px-4 py-3 max-w-2xl mx-auto">
         <button
           onClick={() => navigate(-1)}
